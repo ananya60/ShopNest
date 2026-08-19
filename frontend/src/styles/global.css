@@ -35,6 +35,8 @@ ul {
 /* Premium Buttons */
 .btn {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  height: 50px;
+  width: fit-content;
   color: #fff;
   padding: 12px 24px;
   border: none;

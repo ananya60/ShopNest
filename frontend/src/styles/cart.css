@@ -118,6 +118,8 @@
 
 .btn-checkout {
   width: 100%;
+  height: 50px;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   padding: 15px;
   font-size: 1.1rem;
   letter-spacing: 0.5px;
