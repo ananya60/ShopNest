@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Product = require('./models/Product');
-const connectDB = require('./config/db');
 
-dotenv.config();
+// 🔴 Replace <db_username> and <db_password> with your real credentials:
+const ATLAS_URI = 'mongodb+srv://ShopNest:ShopNest123456789@cluster0.5blatir.mongodb.net/shopnest?retryWrites=true&w=majority&appName=Cluster0';
 
 const importData = async () => {
   try {
-    await connectDB();
+    console.log('Connecting to cloud MongoDB Atlas...');
+    const conn = await mongoose.connect(ATLAS_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
 
     await User.deleteMany();
     await Product.deleteMany();
@@ -24,6 +25,7 @@ const importData = async () => {
       role: 'admin',
     });
 
+    console.log('Fetching dummy products...');
     const response = await fetch('https://dummyjson.com/products?limit=100');
     const data = await response.json();
 
@@ -40,14 +42,11 @@ const importData = async () => {
 
     await Product.insertMany(products);
 
-    console.log('Dummy products imported successfully!');
-
+    console.log('Dummy products imported successfully to Atlas cloud!');
     await mongoose.connection.close();
     process.exit(0);
   } catch (error) {
     console.error(`Error with data import: ${error.message}`);
-
-    await mongoose.connection.close();
     process.exit(1);
   }
 };

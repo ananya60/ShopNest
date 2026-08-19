@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const About = () => {
   const containerStyle = {
@@ -26,7 +27,6 @@ const About = () => {
 
   return (
     <div style={containerStyle}>
-      
       <h1
         style={{
           fontSize: '2.5rem',
@@ -59,14 +59,9 @@ const About = () => {
           marginTop: '20px'
         }}
       >
-        <a
-          href="http://localhost:3000/"
-          target="_blank"
-          rel="noreferrer"
-          style={socialBtnStyle}
-        >
+        <Link to="/" style={socialBtnStyle}>
           🌐 Website
-        </a>
+        </Link>
       </div>
     </div>
   );

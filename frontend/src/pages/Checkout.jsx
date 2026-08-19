@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { clearCart } from '../redux/cartSlice';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://shopnest-dsu5.onrender.com';
+
 const Checkout = () => {
   const { user } = useContext(AuthContext);
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -11,14 +13,18 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState({
-    fullName: '', street: '', city: '', postalCode: '', country: ''
+    fullName: '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: ''
   });
 
   const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
   const handlePayment = async () => {
     try {
-      const orderRes = await fetch('http://localhost:5000/api/payment/order', {
+      const orderRes = await fetch(`${API_URL}/api/payment/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalPrice })
@@ -43,13 +49,13 @@ const Checkout = () => {
         description: 'Test Transaction',
         order_id: orderData.id,
         handler: async function (response) {
-          const verifyRes = await fetch('http://localhost:5000/api/payment/verify', {
+          const verifyRes = await fetch(`${API_URL}/api/payment/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response)
           });
           if (verifyRes.ok) {
-            const saveOrderRes = await fetch('http://localhost:5000/api/orders', {
+            const saveOrderRes = await fetch(`${API_URL}/api/orders`, {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',
@@ -82,7 +88,7 @@ const Checkout = () => {
           color: '#f97316'
         }
       };
-      
+
       const rzp1 = new window.Razorpay(options);
       rzp1.open();
     } catch (error) {
@@ -91,22 +97,28 @@ const Checkout = () => {
   };
 
   const bypassPayment = async () => {
-    const saveOrderRes = await fetch('http://localhost:5000/api/orders', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${user.token}`
-      },
-      body: JSON.stringify({
-        items: cartItems,
-        totalAmount: totalPrice,
-        address,
-        paymentId: 'bypass_txn_' + Date.now()
-      })
-    });
-    if (saveOrderRes.ok) {
-      dispatch(clearCart());
-      navigate('/ordersuccess');
+    try {
+      const saveOrderRes = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          totalAmount: totalPrice,
+          address,
+          paymentId: 'bypass_txn_' + Date.now()
+        })
+      });
+      if (saveOrderRes.ok) {
+        dispatch(clearCart());
+        navigate('/ordersuccess');
+      } else {
+        alert('Order saving failed in bypass mode');
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 

@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../redux/cartSlice';
 import '../styles/product.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://shopnest-dsu5.onrender.com';
+
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -13,11 +15,11 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`);
+        const res = await fetch(`${API_URL}/api/products/${id}`);
         const data = await res.json();
         setProduct(data);
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching product details:', error);
       } finally {
         setLoading(false);
       }
@@ -28,7 +30,7 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (product) {
       dispatch(addToCart({
-        productId: product._id,
+        productId: product._id || product.id,
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl,
@@ -60,7 +62,7 @@ const ProductDetail = () => {
           
           <h2 style={{ fontSize: '2.8rem', marginBottom: '10px' }}>{product.name}</h2>
 
-          <p className="detail-price" style={{ fontSize: '2.5rem', margin: '15px 0' }}>₹{product.price.toFixed(2)}</p>
+          <p className="detail-price" style={{ fontSize: '2.5rem', margin: '15px 0' }}>₹{Number(product.price).toFixed(2)}</p>
 
           {/* Description */}
           <div style={{ marginBottom: '25px' }}>

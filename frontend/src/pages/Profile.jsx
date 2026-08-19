@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://shopnest-dsu5.onrender.com';
+
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const Profile = () => {
     }
     const fetchMyOrders = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/orders/myorders', {
+        const res = await fetch(`${API_URL}/api/orders/myorders`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         const data = await res.json();
@@ -29,7 +31,7 @@ const Profile = () => {
           setOrders([]);
         }
       } catch (error) {
-        console.error(error);
+        console.error('Failed to fetch orders:', error);
       } finally {
         setLoading(false);
       }
@@ -42,10 +44,26 @@ const Profile = () => {
     navigate('/login');
   };
 
-  const containerStyle = { maxWidth: '1000px', margin: '40px auto', padding: '30px', background: '#18181b', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', color: '#fafafa' };
-  const badgeStyle = { background: 'rgba(249,115,22,0.1)', color: '#f97316', padding: '6px 12px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 'bold', display: 'inline-block' };
+  const containerStyle = { 
+    maxWidth: '1000px', 
+    margin: '40px auto', 
+    padding: '30px', 
+    background: '#18181b', 
+    borderRadius: '12px', 
+    border: '1px solid rgba(255,255,255,0.05)', 
+    color: '#fafafa' 
+  };
+  
+  const badgeStyle = { 
+    background: 'rgba(249,115,22,0.1)', 
+    color: '#f97316', 
+    padding: '6px 12px', 
+    borderRadius: '8px', 
+    fontSize: '0.9rem', 
+    fontWeight: 'bold', 
+    display: 'inline-block' 
+  };
 
-  // Compact logout button style
   const logoutBtnStyle = {
     background: '#ef4444',
     color: '#fff',
@@ -79,12 +97,9 @@ const Profile = () => {
       ) : orders.length === 0 ? (
         <div style={{ background: '#09090b', padding: '30px', borderRadius: '8px', textAlign: 'center', border: '1px solid #27272a' }}>
           <p style={{ color: '#a1a1aa', marginBottom: '15px' }}>You haven't placed any orders yet.</p>
-          
-          {/* Linked directly to frontend home or shop route */}
           <Link to="/" style={{ color: '#f97316', textDecoration: 'underline' }}>
             Start Shopping
           </Link>
-          
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '20px' }}>

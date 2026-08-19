@@ -14,12 +14,15 @@ const Cart = () => {
   };
 
   const handleUpdateQty = (item, qty) => {
+    const id = item.productId || item._id;
     if (qty > 0) {
       dispatch(addToCart({ ...item, qty }));
+    } else {
+      dispatch(removeFromCart(id));
     }
   };
 
-  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * (item.qty || 1), 0);
 
   return (
     <div className="cart-container">
@@ -29,21 +32,24 @@ const Cart = () => {
       ) : (
         <div className="cart-layout">
           <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={item.productId} className="cart-item">
-                <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
-                <div className="cart-item-details">
-                  <h4>{item.name}</h4>
-                  <p>₹{item.price}</p>
-                  <div className="qty-controls">
-                    <button onClick={() => handleUpdateQty(item, item.qty - 1)}>-</button>
-                    <span>{item.qty}</span>
-                    <button onClick={() => handleUpdateQty(item, item.qty + 1)}>+</button>
+            {cartItems.map((item) => {
+              const id = item.productId || item._id;
+              return (
+                <div key={id} className="cart-item">
+                  <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
+                  <div className="cart-item-details">
+                    <h4>{item.name}</h4>
+                    <p>₹{item.price}</p>
+                    <div className="qty-controls">
+                      <button onClick={() => handleUpdateQty(item, (item.qty || 1) - 1)}>-</button>
+                      <span>{item.qty || 1}</span>
+                      <button onClick={() => handleUpdateQty(item, (item.qty || 1) + 1)}>+</button>
+                    </div>
+                    <button onClick={() => handleRemove(id)} className="btn-remove">Remove</button>
                   </div>
-                  <button onClick={() => handleRemove(item.productId)} className="btn-remove">Remove</button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="cart-summary">
             <h3>Total: ₹{totalPrice.toFixed(2)}</h3>
